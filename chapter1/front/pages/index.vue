@@ -1,10 +1,10 @@
 <template>
-    <div>
-        <post-card />
-        <post-card />
-        <post-card />
-        <post-card />
-    </div>
+  <div>
+    <post-card />
+    <post-card />
+    <post-card />
+    <post-card />
+  </div>
 </template>
 
 <script>
