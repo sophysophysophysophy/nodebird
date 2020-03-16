@@ -1,8 +1,15 @@
 export const state = () => ({
     me: null,
-    followerList: [{nickname:'제로초', email:'1343@naver.com'},{nickname:'네초', email:'얌망@naver.com'},{nickname:'일초', email:'낄낄@naver.com'}],
-    followingList: [{nickname:'제로초', email:'1343@naver.com'},{nickname:'네초', email:'얌망@naver.com'},{nickname:'일초', email:'낄낄@naver.com'}]
+    followerList: [],
+    followingList: [],
+    hasMoreFollowing: true,
+    hasMoreFollower: true,
 });
+
+//for paginate : 실무에서는 이 방식보다 last id 사용!! 
+const totalFollowers = 8
+const totalFollowings = 6
+const limit = 3
 
 
 //state만 함수고 나머지는 객체 
@@ -31,6 +38,29 @@ export const mutations = {
         const index = state.followingList.findIndex(v => v.email === payload)
         state.followingList.splice(index,1)
     },
+    loadMoreFollowers(state) {
+        const diff = totalFollowers - state.followerList.length
+        const fakeUsers = Array(diff > limit ? limit : diff).fill().map(v => ({
+            nickname:Math.floor(Math.random()*1000),
+            email:Math.floor(Math.random()*1000),
+        }))
+        state.followerList = state.followerList.concat(fakeUsers)
+        state.hasMoreFollower = fakeUsers.length === limit
+    },
+
+    loadMoreFollowings(state) {
+        const diff = totalFollowings - state.followingList.length
+        const fakeUsers = Array(diff > limit ? limit : diff).fill().map(v => ({
+            nickname:Math.floor(Math.random()*1000),
+            email:Math.floor(Math.random()*1000),
+        }))
+        state.followingList = state.followingList.concat(fakeUsers)
+
+
+        // 전체수가 limit의 배수일 때는 더보기 버튼이 활성화될 수밖에 없음. 이 방식의 한계
+        // 예외처리해줄 수도 있지만 굳이...? 암튼 선택임!
+        state.hasMoreFollowing = fakeUsers.length === limit
+    }
 };
 
 // context : 객체 {commit, dispatch, rootState, getters, rootGetters} 등으로 구성
@@ -56,6 +86,16 @@ export const actions ={
     },
     removeFollowing({ commit },payload) {
         commit('removeFollowing', payload)
-    }
+    },
+    loadFollowers({commit, state}, payload){
+       if(state.hasMoreFollower){
+            commit('loadMoreFollowers')
+       }
+    },
+    loadFollowings({commit, state}, payload){
+        if(state.hasMoreFollowing){
+             commit('loadMoreFollowings')
+        }
+     },
 
 };

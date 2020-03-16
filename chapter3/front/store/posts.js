@@ -5,10 +5,20 @@ export const state = () => ({
     hasMorePost: true,
 });
 
-const limit
+
+// 실무에서는 limit으로 안하고 last id 기반 (마지막으로 불러온 게시글 id 이후의 게시글 불러오는 방식)
+const totalPosts = 41
+const limit = 10
+
+//virtualized list : 실제로 구현하기 매우 어려움. 이미 생성되어있는 라이브러리 사용 권장
+// ex) vue-virtual-scroll-list (npm)
+// 높이 알아내는 등 복잡한 내용이 많아서 강의에서는 사용 안함.
+// 실무에서는 virtualized list로 구현하는 것이 좋음! 
+
 
 // mutations은 함수가 아니라 일반 객체로 만들어야 함
 export const mutations = {
+    
     addMainPost(state, payload) {
         //unshift : 맨 앞에 push
         state.mainPosts.unshift(payload)
@@ -23,20 +33,22 @@ export const mutations = {
         // console.log(state.mainPosts[index].Comments);
     },
     loadPosts(state, payload) {
+        const diff = totalPosts - state.mainPosts.length //아직 안 불러온 게시글 수
         // 빈 배열 만들어서 더미 데이터 만들기
-        const fakePosts = Array(limit.fill().map(v=()=>({
+        const fakePosts = Array(diff > limit ? limit : diff).fill().map(v => ({
 
             id:Math.random().toString(),
             User: {
                 id: 1,
-                nickname: '제로초',
+                nickname: '정현주',
             },
-            content: 'Hello ~ ${Math.random()}',
+            content: 'Hello infinite scrolling~ '  + Math.random(),
             Comments: [],
             Images: [],
 
         }))
-        
+        state.mainPosts = state.mainPosts.concat(fakePosts)
+        state.hasMorePost = fakePosts.length === limit
     }
 };
 
