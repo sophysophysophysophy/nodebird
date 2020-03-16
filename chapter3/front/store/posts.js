@@ -1,8 +1,11 @@
 export const state = () => ({
     mainPosts:[],
+
+    // for 인피니트 스크롤링 
+    hasMorePost: true,
 });
 
-
+const limit
 
 // mutations은 함수가 아니라 일반 객체로 만들어야 함
 export const mutations = {
@@ -18,6 +21,22 @@ export const mutations = {
         const index = state.mainPosts.findIndex(v => v.id === payload.postId)
         state.mainPosts[index].Comments.unshift(payload)
         // console.log(state.mainPosts[index].Comments);
+    },
+    loadPosts(state, payload) {
+        // 빈 배열 만들어서 더미 데이터 만들기
+        const fakePosts = Array(limit.fill().map(v=()=>({
+
+            id:Math.random().toString(),
+            User: {
+                id: 1,
+                nickname: '제로초',
+            },
+            content: 'Hello ~ ${Math.random()}',
+            Comments: [],
+            Images: [],
+
+        }))
+        
     }
 };
 
@@ -34,5 +53,11 @@ export const actions = {
     },
     addComment({ commit }, payload) {
         commit('addComment', payload);
+    },
+    loadPosts({ commit, state }, payload) {
+        if(state.hasMorePost) {
+            commit('loadPosts', payload)
+        }
     }
+
 }
