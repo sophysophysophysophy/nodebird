@@ -9,3 +9,13 @@ nuxt : website 생성을 위해 vue 개념을 확장한 프레임워크
 
 ----------------------------------------------------------------------------------
 
+mysql community - 5 version
+백
+1. npm init
+2. npm i express 
+
+3. mysql 설치
+4. npm i sequelize mysql2
+5. npm i -D sequelize-cli
+6. npx sequelize init
+npm i -D nodemon

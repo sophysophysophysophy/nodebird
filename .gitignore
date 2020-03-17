@@ -8,3 +8,8 @@ chapter2/front/node_modules
 
 chapter3/front/.nuxt
 chapter3/front/node_modules
+
+chapter4/front/.nuxt
+chapter4/front/node_modules
+
+chapter4/back/node_modules
