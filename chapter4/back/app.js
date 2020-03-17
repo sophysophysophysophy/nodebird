@@ -1,6 +1,9 @@
 const express = require('express')  //node는 import가 아니라 require를 사용
-
+const db = require('./models')
 const app = express();      //express 함수 호출
+
+db.sequelize.sync() //db가 시작됨
+
 //express는 기본적으로 json body를 못 받음. 
 // 따로 선언해줘야함 
 app.use(express.json()) // req body에 json 넣어준다
@@ -16,10 +19,20 @@ app.get('/', (req, res) =>{
     //res.status(200).send('안녕 백엔드) -> status(200) 생략 : 통신 성공했을 떄 200
 })
 
-app.post('/user', (req, res) => {
-    req.body.email
-    req.body.password
-    req.body.nickname
+app.post('/user', async (req, res) => {
+    try{
+        const newUser = await db.User.create({
+            email:req.body.email,
+            password:req.body.password,
+            nickname:req.body.nickname,
+        })
+        //201 : 성공적으로 생성됨  (HTTP STATUS CODE)
+        res.status(201).json(newUser)
+    } catch (err) {
+        console.log(err);
+        next(err)
+        
+    }
 })
 
 
