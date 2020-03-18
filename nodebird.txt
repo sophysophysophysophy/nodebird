@@ -19,3 +19,12 @@ mysql community - 5 version
 5. npm i -D sequelize-cli
 6. npx sequelize init
 npm i -D nodemon
+
+
+npm i cors
+npm i --g --production windows-build-tools
+npm i bcrypt
+npm i passport passport-local		//인증 시스템을 간단하게 만들어주는 플러그인
+npm i express-session
+npm i cookie-parser
+npm i morgan

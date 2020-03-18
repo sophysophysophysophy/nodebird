@@ -73,7 +73,7 @@ export const actions ={
         // console.log(this.$axios);
         //this.$axios.get('/'); //backend 서버에서 app.get('/') 과  매칭되는 것 
         // 이렇게 두는 주소 체계 = REST API : 지키는 회사는 많지안음. REST 비스무리한 API, HTTP API.
-        this.$axios.post('/user', {
+        this.$axios.post('http://localhost:3085/user', {    //back으로 요청보냄
             nickname:payload.nickname,
             email:payload.email,
             password:payload.password,
