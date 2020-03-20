@@ -4,8 +4,8 @@
     <v-card>
       <v-form ref="form" v-model="valid" @submit.prevent="onSubmitForm">
         <v-container>
-          <v-text-field label="이메일" :rules="emailRules" type="email" required />
-          <v-text-field label="비밀번호" :rules="passwordRules" type="password" required />
+          <v-text-field v-model="email" label="이메일" :rules="emailRules" type="email" required />
+          <v-text-field v-model="password" label="비밀번호" :rules="passwordRules" type="password" required />
         </v-container>
         <v-btn color="green" type="submit" :disabled="!valid">
           로그인
@@ -33,7 +33,7 @@ export default {
     data() {
         return {
             valid:false,
-            emall: '',
+            email: '',
             password:'',
             emailRules: [
             v => !!v || '이메일은 필수입니다.',
@@ -51,10 +51,12 @@ export default {
     },
     methods: {
         onSubmitForm(){
+          console.log(this.email);
+          
             if(this.$refs.form.validate()){
                 this.$store.dispatch('users/logIn', {
-                  emall:this.email,
-                  nickname:'정현주',
+                  email:this.email,
+                  password:this.password,
                 })
             }
         },

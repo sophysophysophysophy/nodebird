@@ -14,9 +14,13 @@ db.sequelize.sync() //db가 시작됨
 passportConfig()
 
 
+//미들웨어의 기능 : req, res 조작하는 것 (use : 미들웨어 )
 app.use(morgan('dev'))
 //모든 요청 다 허용 : app.use(cors())
-app.use(cors('http://localhost:3000'))
+app.use(cors({
+    origin:'http://localhost:3000',
+    credentials:true,
+}))
 //express는 기본적으로 json body를 못 받음. 
 // 따로 선언해줘야함 
 app.use(express.json()) // req body에 json 넣어준다
@@ -26,6 +30,10 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     secret: 'cookiesecret',
+    cookie: {
+        httpOnly:true,
+        secure:false,
+    }
 }))
 app.use(passport.initialize())
 app.use(passport.session())     //session : 메모리. 사용자 로그인한 정보 저장
@@ -43,7 +51,9 @@ app.post('/user', async (req, res) => {
     try{
         const hash = await bcrypt.hash(req.body.password,12)  //bcrypt로 비밀번호 암호화 12는 암호화 안전도 (높을수록 안전 but 느려짐)
         const exUser = await db.User.findOne({      // db에서 email값 똑같은 user있는지 find
-            email: req.body.email   
+            where:{
+                 email: req.body.email
+            }
         })
         if(exUser) {    //이미 회원가입되어있으면
             return res.status(403).json({           // return 중요!! -> 응답은 한번만 보내야하기 때문에 여기서 return 안하면 script 쭉 실행됨;
@@ -56,6 +66,22 @@ app.post('/user', async (req, res) => {
             password:hash,
             nickname:req.body.nickname,
         })
+        passport.authenticate('local', (err, user, info) => {
+            if(err) {
+                console.error(err)
+                return next(err)
+            }
+            if(info) {
+                return res.status(401).send(info.reason)
+            }
+            return req.logIn(user, async (err) => {
+                if(err) {
+                    console.error(err)
+                    return next(err)
+                }
+                return res.json(user)
+            })
+        })
         //201 : 성공적으로 생성됨  (HTTP STATUS CODE)
         res.status(201).json(newUser)
     } catch (err) {
@@ -64,21 +90,35 @@ app.post('/user', async (req, res) => {
     }
 })
 
-
-
-
 //login 하기
-app.post('/user/login', (req, res) => {
-    req.body.email
-    req.body.password
-
+app.post('/user/login', (req, res, next) => {
     //email과 password 검사
     // 일치하면 session, cookie에 정보 저장 
     // front에 쿠키 내려보내주기
     // 이러한 세션 저장 및 쿠키 내려보내는 일련의 과정 굉장히 복잡하고 어렵. -> passport 사용하여 좀 더 쉽게 구현
 
+    //localstretegy 실행이 됨. 직접 실행을 시켜줘야 함 저절로 안됨.
+    passport.authenticate('local', (err, user, info) => { //(err, user, info) : done 콜백 함수의 return값이 세개. 에러.성공.실패 
+        if(err) {
+            console.error(err)
+            return next(err)
+        }
+        if(info) {
+            return res.status(401).send(info.reason)       //클라이언트에서 잘못된 요청을 한 것이기 때문에 거절. 틀린 이유도 send해줌
+        }
 
-
+        // req.login : 원래 있던거 아님. passport initalize에서 req에 login, logout 넣어줌. login의 역할 : 세션에 사용자 정보 넣어줌 (어떻게? : serializeUser)
+        // 미들웨어의 기능 : req, res 조작하는 것
+        // 세션에다 정보 저장 (어떻게?) -> serializeUser : 로그인할 때 한번 호출하여 값 저장( 사용자 id만)
+        return req.login(user, async (err) => {
+            //에러처리 
+            if(err) {
+                console.error(err)
+                return next(err)    //front에도 err 정보 넘겨주기.
+            }
+            return res.json(user)   // body에 정보 담아 넘겨주기
+        })  
+    })(req, res, next)          
 })
 
 

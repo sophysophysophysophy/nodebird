@@ -29,7 +29,7 @@ export const mutations = {
 
         // es5
         // state.followerList.findIndex(function (param) {
-        //     return param.email === 'dffd';
+        //     return param.email === payload;
         //   });
 
         state.followerList.splice(index,1)
@@ -77,13 +77,37 @@ export const actions ={
             nickname:payload.nickname,
             email:payload.email,
             password:payload.password,
-        }) 
+        }, {
+            withCredentialss:true,
+        })
+        .then((data) => {         //promise객체 -> then or async await으로 처리
+            console.log(data)
+            commit('setMe', payload)    
+        })
+        .catch((data) => {
+            console.log(data);
+        })
         // header : 정해진 데이터만 넣을 수 있음 (형식) -> body에 담아서 많이 보냄 
 
-        commit('setMe', payload)
+        
     },
     logIn(context, payload) {
-        context.commit('setMe', payload);
+        //서버에 로그인 요청 보내기
+        this.$axios.post('http://localhost:3085/user/login', {
+            email:payload.email,
+            password:payload.password,
+        }, {
+            withCredentialss:true,
+        })
+        .then((data) => {
+            console.log(data);
+            context.commit('setMe', payload);
+        })
+        .catch((err) => {
+            console.error(err);
+            
+        })
+        
     },
     logOut(context){
         context.commit('setMe', null);
